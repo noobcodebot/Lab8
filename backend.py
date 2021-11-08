@@ -69,7 +69,6 @@ class Teachers(db.Model):
     user_id = db.relationship('User', backref=db.backref('user', lazy=True))
 
 
-
 class AdminView(sqla.ModelView):
 
     def is_accessible(self):
