@@ -7,7 +7,6 @@ from flask_admin import Admin
 from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
 from flask_admin.contrib.sqla import ModelView
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
@@ -33,7 +32,6 @@ class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     username = db.Column(db.String(25), nullable=False)
     password = db.Column(db.String(25), nullable=False)
-    student_id = db.relationship
 
     def __init__(self, username, password):
         self.username = username
@@ -64,7 +62,7 @@ class Students(db.Model):
     name = db.Column(db.String(25), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     enrollments = db.relationship('Enrollment', backref=db.backref('enrollment', lazy=True))
-
+    
 
 class Enrollment(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
@@ -128,5 +126,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
