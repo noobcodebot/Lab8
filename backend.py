@@ -83,10 +83,16 @@ db.create_all()
 db.session.commit()
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
     return render_template('login.html')
 
 
