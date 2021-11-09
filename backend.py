@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, ForeignKey
 import os.path
 from flask_admin import Admin
-from flask_login import LoginManager, UserMixin, current_user, login_user
+from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -26,13 +26,14 @@ app.secret_key = 'keep secret'  # placeholder
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users.get(user_id)
+    return Users.query.get(user_id)
 
 
 class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     username = db.Column(db.String(25), nullable=False)
     password = db.Column(db.String(25), nullable=False)
+    student_id = db.relationship
 
     def __init__(self, username, password):
         self.username = username
@@ -98,18 +99,31 @@ def home():
     return redirect(url_for('login'))
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
-        return render_template('user_page.html', display=current_user.name)
+        return redirect(url_for('user_page', name=current_user.username))
     if request.method == 'POST':
         user = Users.query.filter_by(username=request.form['username']).first()
         if user is None or not user.check_password(request.form['password']):
             errmsg = 'Invalid username or password'
             return redirect(url_for('login', error=errmsg))
         login_user(user)
-        return render_template('user_page.html')
+        return redirect(url_for('user_page', name=user.username))
     return render_template('login.html')
+
+
+@app.route('/user/<name>', methods=['POST', 'GET'])
+@login_required
+def user_page(name):
+    return render_template('user_page.html', user=name)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':

@@ -3,6 +3,17 @@ h1 {
     font-family: Arial;
 }
 
+.display {
+    position: relative;
+}
+
+.log-button {
+    position: absolute;
+
+    left:0;
+    transform: translateY(-50%);
+}
+
 button {
     background-color: dodgerblue;
     text-align: center;

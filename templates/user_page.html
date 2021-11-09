@@ -7,10 +7,18 @@
 
 </head>
 <body>
-    <h1>
-        <div id="display" class="display">
-            {{display}}
-        </div>
-    </h1>
+    <display>
+        <Form action="{{url_for('logout')}}">
+            <div>
+                <button class="log-button">Log Out</button>
+            </div>
+        </Form>
+        <h1>
+            <div id="display">
+                Hello {{user}}
+            </div>
+        </h1>
+    </display>
+
 </body>
 </html>
