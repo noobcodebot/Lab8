@@ -7,7 +7,6 @@ from flask_admin import Admin
 from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
 from flask_admin.contrib.sqla import ModelView
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
@@ -43,6 +42,11 @@ class Users(UserMixin, db.Model):
 
 admin.add_view(ModelView(Users, db.session))
 
+# table for many to many relationship between classes and enrollments
+course_enrollments = db.Table('enrollments',
+                              db.Column('class_id', db.Integer, db.ForeignKey('classes.id'), primary_key=True),
+                              db.Column('enrollment_id', db.Integer, db.ForeignKey('enrollment.id'), primary_key=True))
+
 
 class Classes(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
@@ -51,7 +55,8 @@ class Classes(db.Model):
     size = db.Column(db.Integer, nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    # enrollments =
+    enrollments = db.relationship('Enrollments', secondary=course_enrollments, lazy='subquery',
+                                  backref=db.backref('enrolled', lazy=True))
 
 
 class Students(db.Model):
@@ -65,7 +70,7 @@ class Students(db.Model):
 class Enrollment(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    # class_id = db.relationship('Classes', backref=db.backref('class', lazy=True))
+    class_id = db.relationship('Classes', backref=db.backref('class', lazy=True))
     grade = db.Column(db.String(10), nullable=False)
 
 
@@ -91,7 +96,7 @@ db.create_all()
 db.session.commit()
 
 
-# return true if Teacher
+# return true if user is a Teacher
 def is_teacher(user):
     teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
     if teacher:
@@ -105,8 +110,17 @@ def home():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login(error='Invalid username or password'):
+    # base case, when page is loaded, check if there's a currently authenticated user
     if current_user.is_authenticated:
+
+        # if the user is authenticated and a teacher, load the teacher page. Later to change to /admin
+        if is_teacher(current_user):
+            return redirect(url_for('teacher_page', name=current_user.username))
+
+        # base return value for students
         return redirect(url_for('user_page', name=current_user.username))
+
+    # when a form is submitted using POST, execute login logic
     if request.method == 'POST':
         user = Users.query.filter_by(username=request.form['username']).first()
         if user is None or not user.check_password(request.form['password']):
@@ -118,6 +132,7 @@ def login(error='Invalid username or password'):
     return render_template('login.html')
 
 
+# app route for a logged in user who isn't a teacher
 @app.route('/user/<name>', methods=['POST', 'GET'])
 @login_required
 def user_page(name):
@@ -138,5 +153,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
