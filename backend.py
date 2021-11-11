@@ -55,7 +55,7 @@ class Classes(db.Model):
     size = db.Column(db.Integer, nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    enrollments = db.relationship('Enrollments', secondary=course_enrollments, lazy='subquery',
+    enrollments = db.relationship('Enrollment', secondary=course_enrollments, lazy='subquery',
                                   backref=db.backref('enrolled', lazy=True))
 
 
@@ -70,7 +70,7 @@ class Students(db.Model):
 class Enrollment(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    class_id = db.relationship('Classes', backref=db.backref('class', lazy=True))
+    # class_id = db.relationship('Classes', backref=db.backref('class', lazy=True))
     grade = db.Column(db.String(10), nullable=False)
 
 
@@ -133,7 +133,7 @@ def login(error='Invalid username or password'):
 
 
 # app route for a logged in user who isn't a teacher
-@app.route('/user/<name>', methods=['POST', 'GET'])
+@app.route('/user/<name>/classes', methods=['POST', 'GET'])
 @login_required
 def user_page(name):
     return render_template('user_page.html', user=name)
