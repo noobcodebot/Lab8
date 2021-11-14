@@ -104,7 +104,7 @@ def home():
 
 
 @app.route('/login', methods=['POST', 'GET'])
-def login(error='Invalid username or password'):
+def login(error='Invalid Username or Password!'):
     if current_user.is_authenticated:
         return redirect(url_for('user_page', name=current_user.username))
     if request.method == 'POST':

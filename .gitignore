@@ -1,0 +1,8 @@
+
+*.xml
+.idea/dbnavigator.xml
+static/.DS_Store
+templates/.DS_Store
+.idea/dbnavigator.xml
+.idea/dataSources.xml
+.DS_Store
