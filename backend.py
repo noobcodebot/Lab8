@@ -101,7 +101,7 @@ def get_user_classes(user):
             names.append(name.class_name)
         return names
     else:
-        student = Students.query.filter(Students.id == user.id).first()
+        student = Students.query.filter(Students.user_id == user.id).first()
         for name in student.classes:
             names.append(name.class_name)
         return names
@@ -109,7 +109,7 @@ def get_user_classes(user):
 
 def get_teachers(user):
     names = []
-    student = Students.query.filter(Students.id == user.id).first()
+    student = Students.query.filter(Students.user_id == user.id).first()
     for entry in student.classes:
         teacher = Teachers.query.filter(Teachers.id == entry.teacher_id).first()
         names.append(teacher.first_name + " " + teacher.last_name)
@@ -119,12 +119,12 @@ def get_teachers(user):
 def get_class_times(user):
     times = []
     if is_teacher(user):
-        teacher = Teachers.query.filter(Teachers.id == user.id).first()
+        teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
         for classes in teacher.classes:
             times.append(classes.timeslot)
         return times
     else:
-        student = Students.query.filter(Students.id == user.id).first()
+        student = Students.query.filter(Students.user_id == user.id).first()
         for classes in student.classes:
             times.append(classes.timeslot)
         return times
@@ -133,12 +133,12 @@ def get_class_times(user):
 def get_enrolled_students(user):
     numbers = []
     if is_teacher(user):
-        teacher = Teachers.query.filter(Teachers.id == user.id).first()
+        teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
         for classes in teacher.classes:
             numbers.append(classes.enrolled)
         return numbers
     else:
-        student = Students.query.filter(Students.id == user.id).first()
+        student = Students.query.filter(Students.user_id == user.id).first()
         for classes in student.classes:
             numbers.append(classes.enrolled)
         return numbers
@@ -147,12 +147,12 @@ def get_enrolled_students(user):
 def get_class_capacity(user):
     numbers = []
     if is_teacher(user):
-        teacher = Teachers.query.filter(Teachers.id == user.id).first()
+        teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
         for classes in teacher.classes:
             numbers.append(classes.size)
         return numbers
     else:
-        student = Students.query.filter(Students.id == user.id).first()
+        student = Students.query.filter(Students.user_id == user.id).first()
         for classes in student.classes:
             numbers.append(classes.size)
         return numbers
@@ -192,12 +192,14 @@ def login(error='Invalid username or password'):
 @login_required
 def user_page(user_id):
     user = Users.query.filter_by(id=user_id).first()
+    student = Students.query.filter(Students.user_id == user.id).first()
+    name = student.first_name
     classes = get_user_classes(user)
     teachers = get_teachers(user)
     times = get_class_times(user)
     enrolled = get_enrolled_students(user)
     cap = get_class_capacity(user)
-    return render_template('user_page.html', classes=classes, teachers=teachers, times=times, enrolled=enrolled, cap=cap)
+    return render_template('user_page.html', classes=classes,teachers=teachers,times=times,enrolled=enrolled,cap=cap,name=name)
 
 
 @app.route('/user_teacher/<user_id>', methods=['POST', 'GET'])
