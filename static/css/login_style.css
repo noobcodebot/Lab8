@@ -9,12 +9,16 @@ h1 {
 
 .log-button {
     position: absolute;
-
     left:0;
     transform: translateY(-50%);
 }
 
+.inner {
+ margin-top:19px;
+}
+
 button {
+    float: bottom;
     background-color: dodgerblue;
     text-align: center;
     display: inline-block;
@@ -38,4 +42,23 @@ body {
     margin-right: auto;
     margin-left: auto;
     background-color: lightgray;
+}
+
+#tabs th{
+    padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: dodgerblue;
+  color: black;
+    border-radius: 2.5px;
+
+}
+
+#tabs td {
+     padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: darkgray;
+  color: black;
+    border-radius: 2.5px;
 }
