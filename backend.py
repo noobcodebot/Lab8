@@ -42,11 +42,6 @@ class Users(UserMixin, db.Model):
 
 admin.add_view(ModelView(Users, db.session))
 
-# table for many to many relationship between classes and enrollments
-course_enrollments = db.Table('enrollments',
-                              db.Column('class_id', db.Integer, db.ForeignKey('classes.id'), primary_key=True),
-                              db.Column('enrollment_id', db.Integer, db.ForeignKey('enrollment.id'), primary_key=True))
-
 
 class Classes(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
@@ -55,7 +50,7 @@ class Classes(db.Model):
     size = db.Column(db.Integer, nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    enrollments = db.relationship('Enrollment', secondary=course_enrollments, lazy='subquery',
+    enrollments = db.relationship('Enrollment', lazy='subquery',
                                   backref=db.backref('enrolled', lazy=True))
 
 
@@ -67,19 +62,18 @@ class Students(db.Model):
     enrollments = db.relationship('Enrollment', backref=db.backref('enrollment', lazy=True))
 
 
-class Enrollment(db.Model):
-    id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    # class_id = db.relationship('Classes', backref=db.backref('class', lazy=True))
-    grade = db.Column(db.String(10), nullable=False)
-
-
 class Teachers(db.Model):
     id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(25), nullable=False)
     last_name = db.Column(db.String(25), nullable=False)
     user_id = db.Column(db.String(10), db.ForeignKey('users.id'), nullable=False)
     classes = db.relationship('Classes', backref=db.backref('class', lazy=True))
+
+
+class Enrollment(db.Model):
+    class_id = db.Column('class_id', db.Integer, db.ForeignKey('classes.id'), primary_key=True)
+    student_id = db.Column('student_id', db.Integer, db.ForeignKey('students.id'), primary_key=True)
+    grade = db.Column('grade', db.String(4), nullable=False)
 
 
 class AdminView(sqla.ModelView):
@@ -103,6 +97,17 @@ def is_teacher(user):
         return True
 
 
+def get_name(user):
+    if is_teacher(user):
+        teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
+        name = teacher.first_name + " " + teacher.last_name
+        return name
+    else:
+        student = Students.query.filter(Students.user_id == user.id).first()
+        name = student.first_name + ' ' + student.last_name
+        return name
+
+
 @app.route('/')
 def home():
     return redirect(url_for('login'))
@@ -115,10 +120,10 @@ def login(error='Invalid username or password'):
 
         # if the user is authenticated and a teacher, load the teacher page. Later to change to /admin
         if is_teacher(current_user):
-            return redirect(url_for('teacher_page', name=current_user.username))
+            return redirect(url_for('user_page', name=get_name(current_user)))
 
         # base return value for students
-        return redirect(url_for('user_page', name=current_user.username))
+        return redirect(url_for('user_page', name=get_name(current_user)))
 
     # when a form is submitted using POST, execute login logic
     if request.method == 'POST':
@@ -127,8 +132,8 @@ def login(error='Invalid username or password'):
             return render_template('login.html', error=error)
         login_user(user)
         if is_teacher(user):
-            return redirect(url_for('teacher_page', name=user.username))
-        return redirect(url_for('user_page', name=user.username))
+            return redirect(url_for('teacher_page', name=get_name(user)))
+        return redirect(url_for('user_page', name=get_name(user)))
     return render_template('login.html')
 
 
