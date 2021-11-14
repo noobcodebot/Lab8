@@ -50,8 +50,7 @@ class Classes(db.Model):
     size = db.Column(db.Integer, nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    enrollments = db.relationship('Enrollment', lazy='subquery',
-                                  backref=db.backref('enrolled', lazy=True))
+    students = db.relationship('Students', secondary='enrollment')
 
 
 class Students(db.Model):
@@ -59,7 +58,7 @@ class Students(db.Model):
     first_name = db.Column(db.String(25), nullable=False)
     last_name = db.Column(db.String(25), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    enrollments = db.relationship('Enrollment', backref=db.backref('enrollment', lazy=True))
+    classes = db.relationship('Classes', secondary='enrollment')
 
 
 class Teachers(db.Model):
@@ -67,7 +66,7 @@ class Teachers(db.Model):
     first_name = db.Column(db.String(25), nullable=False)
     last_name = db.Column(db.String(25), nullable=False)
     user_id = db.Column(db.String(10), db.ForeignKey('users.id'), nullable=False)
-    classes = db.relationship('Classes', backref=db.backref('class', lazy=True))
+    classes = db.relationship('Classes', backref=db.backref('classes', lazy=True))
 
 
 class Enrollment(db.Model):
@@ -97,15 +96,20 @@ def is_teacher(user):
         return True
 
 
-def get_name(user):
+def get_classes(user):
+    classes = []
     if is_teacher(user):
         teacher = Teachers.query.filter(Teachers.user_id == user.id).first()
-        name = teacher.first_name + " " + teacher.last_name
-        return name
+        for x in teacher.classes:
+            added = Classes.query.filter(Classes.id == x.id).first()
+            classes.append(added.class_name)
+        return classes
     else:
-        student = Students.query.filter(Students.user_id == user.id).first()
-        name = student.first_name + ' ' + student.last_name
-        return name
+        student = Students.query.filter(Students.id == user.id).first()
+        for x in student.classes:
+            class_to_add = Classes.query.filter(Classes.id == x.id).first()
+            classes.append(class_to_add.class_name)
+        return classes
 
 
 @app.route('/')
@@ -120,10 +124,10 @@ def login(error='Invalid username or password'):
 
         # if the user is authenticated and a teacher, load the teacher page. Later to change to /admin
         if is_teacher(current_user):
-            return redirect(url_for('user_page', name=get_name(current_user)))
+            return redirect(url_for('user_page', name=get_classes(current_user)))
 
         # base return value for students
-        return redirect(url_for('user_page', name=get_name(current_user)))
+        return redirect(url_for('user_page', name=get_classes(current_user)))
 
     # when a form is submitted using POST, execute login logic
     if request.method == 'POST':
@@ -132,8 +136,8 @@ def login(error='Invalid username or password'):
             return render_template('login.html', error=error)
         login_user(user)
         if is_teacher(user):
-            return redirect(url_for('teacher_page', name=get_name(user)))
-        return redirect(url_for('user_page', name=get_name(user)))
+            return redirect(url_for('teacher_page', name=get_classes(user)))
+        return redirect(url_for('user_page', name=get_classes(user)))
     return render_template('login.html')
 
 
