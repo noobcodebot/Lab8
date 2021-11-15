@@ -71,11 +71,11 @@ input{
 }
 #tabs th{
     padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: dodgerblue;
-  color: black;
-    border-radius: 2.5px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: dodgerblue;
+    color: white;
+    border-radius: 10px;
 
 }
 
