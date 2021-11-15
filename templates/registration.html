@@ -18,7 +18,7 @@
         <button class="log-button">Log Out</button>
     </div>
 </Form><br>
-<h1>Hello {{name}}!</h1>
+<h3>Add/Drop classes</h3>
  <h1>
      <div id="display">
                 <table id="tabs" align="center">
@@ -40,15 +40,13 @@
                                 </tr>
                         {% endfor %}
                     </table>
-                    {% else %}
-
                     {% endif %}
                 {% endblock content%}
             </div>
-     <h2>
-         <label for="class" class="absoleft">Add/Drop Class:</label>
-         <input type="text" id="class" name="class" class="absoleft-box"><br><br>
-     </h2>
-        </h1>
+        <h3>
+            <label for="class" class="absoleft">Enter course ID:</label>
+            <input type="text" id="class" name="class" class="absoleft-box"><br><br>
+        </h3>
+ </h1>
 </body>
 </html>

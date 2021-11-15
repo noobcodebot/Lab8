@@ -262,7 +262,7 @@ def teacher_page():
     enrolled = get_enrolled_students(user)
     cap = get_class_capacity(user)
     return render_template(
-        'user_page.html', classes=classes, enrolled=enrolled, times=times, name=name, cap=cap, teachers=teachers
+        'teacher_page.html', classes=classes, enrolled=enrolled, times=times, name=name, cap=cap, teachers=teachers
     )
 
 
@@ -296,6 +296,16 @@ def registration():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+@app.route('/class/', methods=['GET', 'POST'])
+@login_required
+def class_cs106():
+    if not is_teacher(current_user):
+        flash('You do not have permission to view this page')
+        return redirect(url_for('login'))
+    return render_template('cse106.html')
+
 
 
 if __name__ == '__main__':
