@@ -26,6 +26,10 @@ h2 {
     display: inline-block;
 }
 
+.inner {
+ margin-top:19px;
+}
+
 button {
     background-color: dodgerblue;
     color: rgba(255,255,255,0.8);
@@ -64,4 +68,22 @@ input{
     margin-right: 25%;
     margin-left: 25%;
     /*margin: 0 auto;*/
+}
+#tabs th{
+    padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: dodgerblue;
+  color: black;
+    border-radius: 2.5px;
+
+}
+
+#tabs td {
+     padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: darkgray;
+  color: black;
+    border-radius: 2.5px;
 }
