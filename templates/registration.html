@@ -12,14 +12,8 @@
     <div>
         <button class="log-button">Log Out</button>
     </div>
-</Form>
-<form action="{{url_for('user_page')}}">
-    <button type="submit" name="reg_button" value="submit_value" class="class-button">
-           My Classes
-    </button>
-</form>
-<br>
-<h1>Hello {{name}}!</h1>
+</Form><br>
+<h3>Add/Drop classes</h3>
  <h1>
      <div id="display">
                 <table id="tabs" align="center">
@@ -41,10 +35,9 @@
                                 </tr>
                         {% endfor %}
                     </table>
-                    {% else %}
-
                     {% endif %}
                 {% endblock content%}
+            </div>
      </div>
      <br>
 
@@ -58,7 +51,6 @@
          </button>
      </form>
      <br>
-     <br>
- </h1>
+     <br></h1>
 </body>
 </html>
