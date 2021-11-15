@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>User Page</title>
     <link rel = "stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
 
 </head>
@@ -13,6 +13,12 @@
                 <button class="log-button">Log Out</button>
             </div>
         </Form>
+        <Form action="{{url_for('add-class-list')}}">
+            <div>
+                <button class="add-button">Add Class</button>
+            </div>
+        </Form>
+        <br><br>
         <h1>
             <div id="display">
                 Hello {{user}}

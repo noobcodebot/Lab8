@@ -129,6 +129,12 @@ def teacher_page(name):
     return render_template('user_page.html', user=name)
 
 
+@app.route('/add-class-list', methods=['POST', 'GET'])
+def add_class():
+
+    return 0
+
+
 @app.route('/logout')
 @login_required
 def logout():
