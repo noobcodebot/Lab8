@@ -291,12 +291,6 @@ def registration():
     )
 
 
-@app.route('/add_class', methods=['POST', 'GET'])
-def add_class():
-
-    return 0
-
-
 @app.route('/logout')
 @login_required
 def logout():
