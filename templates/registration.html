@@ -49,7 +49,14 @@
      <br>
 
      <h2>Add/Drop Class:</h2>
-     <input type="text" id="class" name="class" class = "classInput">
+
+     <form action="{{url_for('registration')}}" method="post">
+         <input type="text" id="class" name="class" class = "classInput">
+         <br>
+         <button type="submit" name="sub_button" value="submit_value" style="display: table; margin: auto;">
+           Submit
+         </button>
+     </form>
      <br>
      <br>
  </h1>

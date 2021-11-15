@@ -194,7 +194,7 @@ def check_class_capacity(student_class):
 
 
 def add_class(student_id, class_id):
-    db.session.add(Enrollment(student_id=student_id, class_id=class_id))
+    db.session.add(Enrollment(student_id=student_id, class_id=class_id, grade = "100"))
     db.session.commit()
 
 
@@ -270,7 +270,15 @@ def teacher_page():
 @login_required
 def registration():
     if request.method == 'POST':
-        return redirect(url_for('user'))
+        classID = int(request.form['class'])
+        selectedClass = Classes.query.filter(Classes.id == classID).first()
+        if check_class_capacity(selectedClass):
+            return render_template(
+                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                name=name, classes=classes, teachers=Teachers)
+        else:
+            add_class(current_user.id,classID)
+        return redirect(url_for('user_page'))
     user = Users.query.filter_by(id=current_user.id).first()
     student = Students.query.filter(Students.user_id == user.id).first()
     name = student.first_name
