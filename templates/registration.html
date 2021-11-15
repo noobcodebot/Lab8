@@ -6,12 +6,7 @@
     <link rel = "stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
 
 </head>
-<body>
-<form action="{{url_for('user_page')}}">
-    <button type="submit" name="reg_button" value="submit_value" class="link-button">
-           My Classes
-    </button>
-</form>
+<body style = "background: url('/static/1.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover; background-position: center">
 <br>
 <Form action="{{url_for('logout')}}">
     <div>
@@ -42,11 +37,21 @@
                     </table>
                     {% endif %}
                 {% endblock content%}
+<<<<<<< HEAD
             </div>
         <h3>
             <label for="class" class="absoleft">Enter course ID:</label>
             <input type="text" id="class" name="class" class="absoleft-box"><br><br>
         </h3>
+=======
+     </div>
+     <br>
+
+     <h2>Add/Drop Class:</h2>
+     <input type="text" id="class" name="class" class = "classInput">
+     <br>
+     <br>
+>>>>>>> 92ca5252435c9d81abb740abb2e4e63b0a1759dd
  </h1>
 </body>
 </html>
