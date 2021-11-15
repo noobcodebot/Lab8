@@ -80,10 +80,40 @@ input{
 }
 
 #tabs td {
-     padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: darkgray;
-  color: black;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: darkgray;
+    color: black;
     border-radius: 2.5px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 1em;
+  font-family: serif;
+  position: absolute;
+  right:0;
+}
+.link-button:focus {
+  outline: none;
+}
+.link-button:active {
+  color:cornflowerblue;
+}
+
+.absoleft-box {
+    position: absolute;
+    left:175px;
+    transform: translateY(-50%);
+}
+
+.absoleft {
+    position: absolute;
+    left:0;
+    transform: translateY(-50%);
 }
