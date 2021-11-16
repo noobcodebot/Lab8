@@ -309,7 +309,7 @@ def registration():
         cap.append(c.size)
 
     if request.method == 'POST':
-        class_id = int(request.form['class'])
+        class_id = int(request.form['reg_button'])
         selected_class = Classes.query.filter(Classes.id == class_id).first()
         student = Students.query.filter(Students.user_id == current_user.id).first()
         if check_class_capacity(selected_class):
