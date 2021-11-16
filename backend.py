@@ -404,19 +404,6 @@ def class_Math101():
                 grades[name] = x.grade
     return render_template('Math101.html', students=student_names, grades=grades)
 
-@app.route('/drop', methods=['GET', 'POST'])
-@login_required
-def drop():
-    if request.method == 'POST':
-        class_id = int(request.form['drop'])
-        student = Students.query.filter(Students.user_id == current_user.id).first()
-        if student.classes.query.filter(student.classes.id == class_id):
-            drop_class(student.id, class_id)
-            return redirect(url_for('registration'))
-        else:
-            return redirect(url_for('registration'))
-    return redirect(url_for('login'))
-
 
 @app.route('/change_grade_106', methods=['GET', 'POST'])
 @login_required
