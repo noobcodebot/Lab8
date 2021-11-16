@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Page</title>
+    <link rel = "stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
 </head>
 <body>
 {% extends 'admin/master.html' %}
 
 {% block body %}
-  <p>
-    This is an admin page.
-  </p>
+<h1 style="color: gray">Welcome to admin page.</h1>
+<h1 style="color: gray">Select a tab to execute CRUD operations on Database entries.</h1>
 {% endblock %}
 </body>
 </html>
