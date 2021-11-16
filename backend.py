@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_admin.contrib import sqla
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, ForeignKey, update
+from sqlalchemy.sql import exists
 import os.path
 from flask_admin import Admin, expose, AdminIndexView
 from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
@@ -108,7 +109,6 @@ class StudentView(AdminMixin, sqla.ModelView):
 # sets up admin page, index_view takes the view perms from AdminIndex()
 admin = Admin(app, name='teacher-view', template_mode='bootstrap3', index_view=AdminIndex())
 
-
 # adding views to flask-admin
 admin.add_view(UserView(Users, db.session))
 admin.add_view(ClassView(Classes, db.session))
@@ -205,15 +205,19 @@ def add_class(student_id, class_id):
 def drop_class(student_id, class_id):
     class_to_drop = Classes.query.filter(Classes.id == class_id).first()
     new_size = class_to_drop.enrolled - 1
-    Enrollment.query.filter(Enrollment.student_id == student_id and Enrollment.class_id == class_id).\
+    Enrollment.query.filter(Enrollment.student_id == student_id and Enrollment.class_id == class_id). \
         delete()
     db.session.commit()
 
 
 def is_enrolled(class_id, student_id):
-    enroll_class = Enrollment.query.filter(Enrollment.class_id == class_id).first()
-    enroll_student = Enrollment.query.filter(Enrollment.student_id == student_id).first()
-    return ()
+    student = Students.query.filter_by(id=student_id).first()
+    classes = student.classes
+    for entry in classes:
+        if entry.id == class_id:
+            return True
+    return False
+
 
 @app.route('/')
 def home():
@@ -313,8 +317,8 @@ def registration():
                 add_class(student.id, class_id)
             else:
                 return render_template(
-                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                name=name, classes=classes, teachers=Teachers, error='You are currently enrolled in this class!')
+                    'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                    name=name, classes=classes, teachers=Teachers, error='You are currently enrolled in this class!')
         return redirect(url_for('user_page'))
     return render_template(
         'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
