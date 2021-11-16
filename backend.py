@@ -311,7 +311,7 @@ def registration():
         if check_class_capacity(selected_class):
             return render_template(
                 'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                name=name, classes=classes, teachers=Teachers, error='haha')
+                name=name, classes=classes, teachers=Teachers, error='Class Capacity is Full')
         else:
             if not is_enrolled(class_id, student.id):
                 add_class(student.id, class_id)
@@ -322,7 +322,7 @@ def registration():
         return redirect(url_for('user_page'))
     return render_template(
         'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-        name=name, classes=classes, teachers=Teachers, error='')
+        name=name, classes=classes, teachers=Teachers, student=student, error='')
 
 
 @app.route('/logout')

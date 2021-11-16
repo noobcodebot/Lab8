@@ -15,8 +15,14 @@
             <div>
                 <button class="log-button">Log Out</button>
             </div>
-           <h3 align="center">Hello {{name}}!</h3>
-        </Form><br>
+       </Form>
+       <Form action="{{url_for('registration')}}">
+            <div>
+                <button class="class-button">Registration</button>
+            </div>
+       </Form>
+       <br>
+       <h3 align="center">Hello {{name}}!</h3>
         <h1>
             <div id="display">
                 <table id="tabs" align="center">
