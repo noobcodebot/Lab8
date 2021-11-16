@@ -30,6 +30,7 @@
                         <th>Teacher</th>
                         <th>Time</th>
                         <th>Students Enrolled</th>
+                        <th>Register</th>
                         {% for class in classes %}
                             {% set t_name = teachers.query.filter_by(id=class.teacher_id).first()%}
                                 <tr>
@@ -38,6 +39,13 @@
                                     <td>{{t_name.first_name + " " + t_name.last_name}}</td>
                                     <td>{{class.timeslot}}</td>
                                     <td>{{class.enrolled}}/{{class.size}}</td>
+                                    <td>
+                                        <form action="{{url_for('registration')}}" method = 'post'>
+                                            <button type="submit" name="reg_button" value={{class.id}} class="reg-button">
+                                                Register
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                         {% endfor %}
                     </table>
@@ -47,15 +55,15 @@
      </div>
      <br>
 
-     <h2>Add Class:</h2>
+<!--     <h2>Add Class:</h2>-->
 
-     <form action="{{url_for('registration')}}" method="post">
-         <input type="text" id="class" name="class" class = "classInput">
-         <br>
-         <button type="submit" name="sub_button" value="submit_value" style="display: table; margin: auto;">
-           Add
-         </button>
-     </form>
+<!--     <form action="{{url_for('registration')}}" method="post">-->
+<!--         <input type="text" id="class" name="class" class = "classInput">-->
+<!--         <br>-->
+<!--         <button type="submit" name="sub_button" value="submit_value" style="display: table; margin: auto;">-->
+<!--           Add-->
+<!--         </button>-->
+<!--     </form>-->
      <h1 style="color: white; font-weight: bold">{{error}}</h1>
      <br>
 
