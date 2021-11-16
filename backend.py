@@ -209,8 +209,8 @@ def add_class(student_id, class_id):
 def drop_class(student_id, class_id):
     class_to_drop = Classes.query.filter(Classes.id == class_id).first()
     new_size = class_to_drop.enrolled - 1
-    class_to_drop.update(dict(enrolled=new_size))
-    Enrollment.query.filter(Enrollment.student_id == student_id and Enrollment.class_id == class_id).delete()
+    class_to_drop.enrolled = new_size
+    Enrollment.query.filter(Enrollment.student_id == student_id, Enrollment.class_id == class_id).delete()
 
     db.session.commit()
 
@@ -292,7 +292,7 @@ def teacher_page():
     )
 
 
-@app.route('/user/registration', methods=['POST', 'DELETE', 'GET'])
+@app.route('/user/registration', methods=['POST', 'GET'])
 @login_required
 def registration():
     user = Users.query.filter_by(id=current_user.id).first()
@@ -310,6 +310,18 @@ def registration():
         cap.append(c.size)
 
     if request.method == 'POST':
+        if request.form['method'] == 'delete':
+            class_id = int(request.form['drop_button'])
+            selected_class = Classes.query.filter(Classes.id == class_id).first()
+            student = Students.query.filter(Students.user_id == current_user.id).first()
+            if not is_enrolled(class_id, student.id):
+                return render_template(
+                    'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                    name=name, classes=classes, teachers=Teachers,
+                    error='You are not currently enrolled in this class!')
+            else:
+                drop_class(student.id, class_id)
+                return redirect(url_for('user_page'))
         class_id = int(request.form['reg_button'])
         selected_class = Classes.query.filter(Classes.id == class_id).first()
         student = Students.query.filter(Students.user_id == current_user.id).first()
@@ -327,17 +339,6 @@ def registration():
                     'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
                     name=name, classes=classes, teachers=Teachers, error='You are currently enrolled in this class!')
 
-    elif request.method == 'DELETE':
-        class_id = int(request.form['drop_button'])
-        selected_class = Classes.query.filter(Classes.id == class_id).first()
-        student = Students.query.filter(Students.user_id == current_user.id).first()
-        if not is_enrolled(class_id, student.id):
-            return render_template(
-                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                name=name, classes=classes, teachers=Teachers, error='You are not currently enrolled in this class!')
-        else:
-            drop_class(student.id, class_id)
-            return redirect(url_for('user_page'))
         return redirect(url_for('user_page'))
 
     return render_template(
