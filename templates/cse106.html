@@ -27,8 +27,10 @@
                         <th>Grade</th>
                         {% for i in range(students|length) %}
                             <tr>
-                                <td>{{students[i]}}</td>
-                                <td>{{grades[i]}}</td>
+                                <td>
+                                    {{students[i]}}
+                                </td>
+                                <td>{{grades[students[i]]}}</td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -36,7 +38,17 @@
 
                     {% endif %}
                 {% endblock content%}
-            </div>
+            </div> <br><br>
+   <form action="{{ url_for('change_grade_106') }}" method="post" >
+            <label for="fname" class="login-label">First Name: </label>
+            <input type="text" id="fname" name="first" class="login-input"> <br><br>
+            <label for="lname" class="login-label">Last Name: </label>
+            <input type="text" id="lname" name="last" class="login-input"> <br><br>
+            <label for="grade" class="login-label">Grade: </label>
+            <input type="text" id="grade" name="grade" class="login-input"> <br><br>
+            <button type="submit" value="submit">Change Grade</button>
+    </form>
         </h1>
+
 </body>
 </html>
