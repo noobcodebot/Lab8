@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS162 Grades</title>
+    <link rel = "stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
+
+</head>
+<body style = "background: url('/static/1.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover; background-position: center">
+<form action="{{url_for('teacher_page')}}">
+        <button type="submit" name="reg_button" value="submit_value" class="link-button">
+            My Classes
+        </button>
+    </form>
+<Form action="{{url_for('logout')}}">
+            <div>
+                <button class="log-button">Log Out</button>
+            </div>
+           <h3>Grader</h3>
+        </Form><br>
+<h1>
+            <div id="display">
+                <table id="tabs" align="center">
+                    {% block content %}
+                    {% if students %}
+                        <th>Student Name</th>
+                        <th>Grade</th>
+                        {% for i in range(students|length) %}
+                            <tr>
+                                <td>
+                                    {{students[i]}}
+                                </td>
+                                <td>{{grades[students[i]]}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% else %}
+
+                    {% endif %}
+                {% endblock content%}
+            </div> <br><br>
+   <form action="{{ url_for('change_grade_162') }}" method="post" >
+            <label for="fname" class="login-label">First Name: </label>
+            <input type="text" id="fname" name="first" class="login-input"> <br><br>
+            <label for="lname" class="login-label">Last Name: </label>
+            <input type="text" id="lname" name="last" class="login-input"> <br><br>
+            <label for="grade" class="login-label">Grade: </label>
+            <input type="text" id="grade" name="grade" class="login-input"> <br><br>
+            <button type="submit" value="submit">Change Grade</button>
+    </form>
+        </h1>
+
+</body>
+</html>
