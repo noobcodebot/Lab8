@@ -7,21 +7,21 @@
 
 </head>
 
-<body style = "background: url('/static/1.jpg'); background-repeat: no-repeat;
-background-attachment: fixed; background-size: cover; background-position: center">
-    <br>
+<body style = "background: url('/static/1.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover; background-position: center">
+<form action="{{url_for('registration')}}">
+        <button type="submit" name="reg_button" value="submit_value" class="link-button">
+            Add/Drop classes
+        </button>
+    </form>
+
+
+       <br>
        <Form action="{{url_for('logout')}}">
             <div>
                 <button class="log-button">Log Out</button>
             </div>
-       </Form>
-        <form action="{{url_for('registration')}}">
-            <button type="submit" name="reg_button" value="submit_value" class="link-button">
-                Add/Drop classes
-            </button>
-        </form>
-        <h3>Hello {{name}}!</h3>
-        <br>
+           <h3>Hello {{name}}!</h3>
+        </Form><br>
         <h1>
             <div id="display">
                 <table id="tabs" align="center">

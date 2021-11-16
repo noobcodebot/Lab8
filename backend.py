@@ -209,9 +209,8 @@ def add_class(student_id, class_id):
 def drop_class(student_id, class_id):
     class_to_drop = Classes.query.filter(Classes.id == class_id).first()
     new_size = class_to_drop.enrolled - 1
-    class_to_drop.enrolled = new_size
-    Enrollment.query.filter(Enrollment.student_id == student_id, Enrollment.class_id == class_id).delete()
-
+    updated = Classes.query.filter_by(id=class_id).update(dict(enrolled=new_size))
+    Enrollment.query.filter(Enrollment.class_id == class_id, Enrollment.student_id == student_id).delete()
     db.session.commit()
 
 
@@ -292,7 +291,7 @@ def teacher_page():
     )
 
 
-@app.route('/user/registration', methods=['POST', 'GET'])
+@app.route('/user/registration', methods=['POST', 'DELETE', 'GET'])
 @login_required
 def registration():
     user = Users.query.filter_by(id=current_user.id).first()
@@ -310,18 +309,6 @@ def registration():
         cap.append(c.size)
 
     if request.method == 'POST':
-        if request.form['method'] == 'delete':
-            class_id = int(request.form['drop_button'])
-            selected_class = Classes.query.filter(Classes.id == class_id).first()
-            student = Students.query.filter(Students.user_id == current_user.id).first()
-            if not is_enrolled(class_id, student.id):
-                return render_template(
-                    'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                    name=name, classes=classes, teachers=Teachers,
-                    error='You are not currently enrolled in this class!')
-            else:
-                drop_class(student.id, class_id)
-                return redirect(url_for('user_page'))
         class_id = int(request.form['reg_button'])
         selected_class = Classes.query.filter(Classes.id == class_id).first()
         student = Students.query.filter(Students.user_id == current_user.id).first()
@@ -333,12 +320,11 @@ def registration():
         else:
             if not is_enrolled(class_id, student.id):
                 add_class(student.id, class_id)
-                return redirect(url_for('user_page'))
+                return redirect(url_for('registration'))
             else:
                 return render_template(
                     'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
                     name=name, classes=classes, teachers=Teachers, error='You are currently enrolled in this class!')
-
         return redirect(url_for('user_page'))
 
     return render_template(
@@ -490,6 +476,37 @@ def change_grade_math101():
                 db.session.commit()
             return redirect(url_for('class_Math101'))
     return redirect(url_for('login'))
+
+
+@app.route('/user/drop', methods=['POST', 'GET'])
+@login_required
+def drop_user_class():
+    user = Users.query.filter_by(id=current_user.id).first()
+    student = Students.query.filter(Students.user_id == user.id).first()
+    name = student.first_name
+    classes = Classes.query.all()
+    class_names = []
+    times = []
+    enrolled = []
+    cap = []
+    for c in classes:
+        class_names.append(c.class_name)
+        times.append(c.timeslot)
+        enrolled.append(c.enrolled)
+        cap.append(c.size)
+
+    if request.method == 'POST':
+        class_id = int(request.form['drop_button'])
+        selected_class = Classes.query.filter(Classes.id == class_id).first()
+        student = Students.query.filter(Students.user_id == current_user.id).first()
+        if not is_enrolled(class_id, student.id):
+            return render_template(
+                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                name=name, classes=classes, teachers=Teachers, error='You are not currently enrolled in this class!')
+        else:
+            drop_class(student.id, class_id)
+            return redirect(url_for('registration'))
+        return redirect(url_for('user_page'))
 
 
 if __name__ == '__main__':
