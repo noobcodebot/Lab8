@@ -154,3 +154,12 @@ body {
     left:0;
     transform: translateY(-50%);
 }
+
+.admin-button {
+    color: white;
+    background-color: transparent;
+    right: 0;
+}
+
+.hide {
+}

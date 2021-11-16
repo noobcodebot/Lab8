@@ -1,12 +1,10 @@
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_admin.contrib import sqla
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, ForeignKey, update
-from sqlalchemy.sql import exists
+from sqlalchemy import create_engine
 import os.path
 from flask_admin import Admin, expose, AdminIndexView
 from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
-from flask_admin.contrib.sqla import ModelView
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -94,7 +92,7 @@ class Enrollment(db.Model):
 
 # The following view classes are views added to admin page
 class UserView(AdminMixin, sqla.ModelView):
-    column_exclude_list = ['Password', ]
+    column_exclude_list = 'password'
     pass
 
 
@@ -106,13 +104,19 @@ class StudentView(AdminMixin, sqla.ModelView):
     pass
 
 
+class TeacherView(AdminMixin, sqla.ModelView):
+    pass
+
+
 # sets up admin page, index_view takes the view perms from AdminIndex()
-admin = Admin(app, name='teacher-view', template_mode='bootstrap3', index_view=AdminIndex())
+admin = Admin(app, name='Database', template_mode='bootstrap3', index_view=AdminIndex())
 
 # adding views to flask-admin
 admin.add_view(UserView(Users, db.session))
 admin.add_view(ClassView(Classes, db.session))
 admin.add_view(StudentView(Students, db.session))
+admin.add_view(TeacherView(Teachers, db.session))
+
 
 db.create_all()
 db.session.commit()
@@ -311,7 +315,8 @@ def registration():
         if check_class_capacity(selected_class):
             return render_template(
                 'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                name=name, classes=classes, teachers=Teachers, error='Class Capacity is Full')
+                name=name, classes=classes, teachers=Teachers,
+                error=f'Class {Classes.query.filter_by(id=class_id).first().class_name} is Full!')
         else:
             if not is_enrolled(class_id, student.id):
                 add_class(student.id, class_id)
@@ -322,7 +327,7 @@ def registration():
         return redirect(url_for('user_page'))
     return render_template(
         'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-        name=name, classes=classes, teachers=Teachers, student=student, error='')
+        name=name, classes=classes, teachers=Teachers, error='')
 
 
 @app.route('/logout')
@@ -340,7 +345,7 @@ def class_cs106():
         return redirect(url_for('login'))
     student_names = []
     students = []
-    grades = []
+    grades = {}
     course = Classes.query.filter_by(class_name='CS 106').first()
     enrolled = Enrollment.query.filter(Enrollment.class_id == course.id)
     for student in course.students:
@@ -349,7 +354,8 @@ def class_cs106():
     for x in enrolled:
         for y in students:
             if y.id == x.student_id:
-                grades.append(x.grade)
+                name = y.first_name + ' ' + y.last_name
+                grades[name] = x.grade
     return render_template('cse106.html', students=student_names, grades=grades)
 
 
@@ -364,6 +370,25 @@ def drop():
             return redirect(url_for('registration'))
         else:
             return redirect(url_for('registration'))
+    return redirect(url_for('login'))
+
+
+@app.route('/change_grade_106', methods=['GET', 'POST'])
+@login_required
+def change_grade_106():
+    if not is_teacher(current_user):
+        redirect(url_for('login'))
+    if request.method == 'POST':
+        fname = request.form['first']
+        lname = request.form['last']
+        student = Students.query.filter(Students.first_name == fname and Students.last_name == lname)
+        grade = request.form['grade']
+        if student.scalar() is not None:
+            record = Enrollment.query.filter(Enrollment.student_id == student.first().id and Enrollment.class_id == 3)
+            if record.all() is not None:
+                record.first().grade = grade
+                db.session.commit()
+            return redirect(url_for('class_cs106'))
     return redirect(url_for('login'))
 
 
