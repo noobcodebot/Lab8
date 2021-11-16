@@ -32,11 +32,6 @@ h3 {
     /*transform: translateY(50%);*/
     display: inline-block;
 }
-.reg-button {
-    /*transform: translateY(50%);*/
-    display: inline-block;
-    background-color: green;
-}
 
 .inner {
  margin-top:19px;
