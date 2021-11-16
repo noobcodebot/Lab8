@@ -383,8 +383,9 @@ def change_grade_106():
         student = Students.query.filter(Students.first_name == fname and Students.last_name == lname)
         grade = request.form['grade']
         if student.scalar() is not None:
-            record = Enrollment.query.filter(Enrollment.student_id == student.first().id and Enrollment.class_id == 3)
-            if record.all() is not None:
+            record = db.session.query(Enrollment).filter(Enrollment.student_id == student.first().id).\
+                filter(Enrollment.class_id == 3)
+            if record.scalar() is not None:
                 record.first().grade = grade
                 db.session.commit()
             return redirect(url_for('class_cs106'))
