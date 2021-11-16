@@ -26,12 +26,7 @@ h3 {
     /*transform: translateY(-50%);*/
     display: inline-block;
 }
-.class-button {
-    position: absolute;
-    right: 10px;
-    /*transform: translateY(50%);*/
-    display: inline-block;
-}
+
 .reg-button {
     /*transform: translateY(50%);*/
     display: inline-block;
@@ -67,7 +62,7 @@ button {
   font-size: 1em;
   font-family: serif;
   position: absolute;
-  right:5px;
+  right:10px;
 }
 
 .link-button2 {
