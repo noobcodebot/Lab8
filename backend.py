@@ -332,13 +332,25 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/class/', methods=['GET', 'POST'])
+@app.route('/class/cs106', methods=['GET', 'POST'])
 @login_required
 def class_cs106():
     if not is_teacher(current_user):
         flash('You do not have permission to view this page')
         return redirect(url_for('login'))
-    return render_template('cse106.html')
+    student_names = []
+    students = []
+    grades = []
+    course = Classes.query.filter_by(class_name='CS 106').first()
+    enrolled = Enrollment.query.filter(Enrollment.class_id == course.id)
+    for student in course.students:
+        student_names.append(student.first_name + " " + student.last_name)
+        students.append(student)
+    for x in enrolled:
+        for y in students:
+            if y.id == x.student_id:
+                grades.append(x.grade)
+    return render_template('cse106.html', students=student_names, grades=grades)
 
 
 @app.route('/drop', methods=['GET', 'POST'])
