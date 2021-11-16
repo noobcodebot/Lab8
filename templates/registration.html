@@ -41,16 +41,14 @@
                                     <td>{{class.timeslot}}</td>
                                     <td>{{class.enrolled}}/{{class.size}}</td>
                                     <td>
-                                        <form action="{{url_for('registration')}}" method = 'post'>
-                                            <input type="hidden" name="method" value="post">
+                                        <form action="{{url_for('registration')}}" method = 'POST'>
                                             <button type="submit" name="reg_button" value={{class.id}} class="reg-button">
                                                 Register
                                             </button>
                                         </form>
                                     </td>
                                     <td>
-                                        <form action="{{url_for('registration')}}" method = 'post'>
-                                            <input type="hidden" name="method" value="delete">
+                                        <form action="{{url_for('drop_user_class')}}" method = 'POST'>
                                             <button type="submit" name="drop_button" value={{class.id}} class="drop-button">
                                                 Drop
                                             </button>
