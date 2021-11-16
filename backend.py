@@ -339,14 +339,14 @@ def logout():
 
 @app.route('/class/cs106', methods=['GET', 'POST'])
 @login_required
-def class_cs106():
+def class_CS106():
     if not is_teacher(current_user):
         flash('You do not have permission to view this page')
         return redirect(url_for('login'))
     student_names = []
     students = []
     grades = {}
-    course = Classes.query.filter_by(class_name='CS 106').first()
+    course = Classes.query.filter_by(class_name='CS106').first()
     enrolled = Enrollment.query.filter(Enrollment.class_id == course.id)
     for student in course.students:
         student_names.append(student.first_name + " " + student.last_name)
@@ -357,6 +357,28 @@ def class_cs106():
                 name = y.first_name + ' ' + y.last_name
                 grades[name] = x.grade
     return render_template('cse106.html', students=student_names, grades=grades)
+
+
+@app.route('/class/cs162', methods=['GET', 'POST'])
+@login_required
+def class_CS162():
+    if not is_teacher(current_user):
+        flash('You do not have permission to view this page')
+        return redirect(url_for('login'))
+    student_names = []
+    students = []
+    grades = {}
+    course = Classes.query.filter_by(class_name='CS162').first()
+    enrolled = Enrollment.query.filter(Enrollment.class_id == course.id)
+    for student in course.students:
+        student_names.append(student.first_name + " " + student.last_name)
+        students.append(student)
+    for x in enrolled:
+        for y in students:
+            if y.id == x.student_id:
+                name = y.first_name + ' ' + y.last_name
+                grades[name] = x.grade
+    return render_template('cs162.html', students=student_names, grades=grades)
 
 
 @app.route('/drop', methods=['GET', 'POST'])
@@ -389,7 +411,27 @@ def change_grade_106():
             if record.scalar() is not None:
                 record.first().grade = grade
                 db.session.commit()
-            return redirect(url_for('class_cs106'))
+            return redirect(url_for('class_CS106'))
+    return redirect(url_for('login'))
+
+
+@app.route('/change_grade_162', methods=['GET', 'POST'])
+@login_required
+def change_grade_162():
+    if not is_teacher(current_user):
+        redirect(url_for('login'))
+    if request.method == 'POST':
+        fname = request.form['first']
+        lname = request.form['last']
+        student = Students.query.filter(Students.first_name == fname and Students.last_name == lname)
+        grade = request.form['grade']
+        if student.scalar() is not None:
+            record = db.session.query(Enrollment).filter(Enrollment.student_id == student.first().id).\
+                filter(Enrollment.class_id == 4)
+            if record.scalar() is not None:
+                record.first().grade = grade
+                db.session.commit()
+            return redirect(url_for('class_CS162'))
     return redirect(url_for('login'))
 
 

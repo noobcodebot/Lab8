@@ -23,9 +23,10 @@
                         <th>Time</th>
                         <th>Students Enrolled</th>
                         {% for i in range(classes|length) %}
+                            {% set class_link = url_for('class_'+classes[i]) %}
                             <tr>
                                 <td>
-                                    <Form action="{{url_for('class_cs106')}}" method="post">
+                                    <Form action="{{class_link}}" method="post">
                                         <button class="link-button2" type="submit" value="submit_value">{{classes[i]}}</button>
                                     </Form>
                                 </td>
