@@ -12,7 +12,13 @@
     <div>
         <button class="log-button">Log Out</button>
     </div>
-</Form><br>
+</Form>
+<form action="{{url_for('login')}}">
+        <button type="submit" name="reg_button" value="submit_value" class="link-button">
+            My Classes
+        </button>
+    </form>
+<br>
 <h3>Add/Drop classes</h3>
  <h1>
      <div id="display">
@@ -41,16 +47,20 @@
      </div>
      <br>
 
-     <h2>Add/Drop Class:</h2>
+     <h2>Add Class:</h2>
 
      <form action="{{url_for('registration')}}" method="post">
          <input type="text" id="class" name="class" class = "classInput">
          <br>
          <button type="submit" name="sub_button" value="submit_value" style="display: table; margin: auto;">
-           Submit
+           Add
          </button>
      </form>
+     {{error}}
      <br>
-     <br></h1>
+
+     <br>
+     <br>
+ </h1>
 </body>
 </html>

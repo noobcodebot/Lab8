@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, url_for, redirect, flash
 from flask_admin.contrib import sqla
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import create_engine, ForeignKey, update
 import os.path
 from flask_admin import Admin, expose, AdminIndexView
 from flask_login import LoginManager, UserMixin, current_user, login_user, login_required, logout_user
@@ -85,8 +85,9 @@ class Teachers(AdminMixin, db.Model):
 
 # joint table for M:M relationships
 class Enrollment(db.Model):
-    class_id = db.Column('class_id', db.Integer, db.ForeignKey('classes.id'), primary_key=True)
-    student_id = db.Column('student_id', db.Integer, db.ForeignKey('students.id'), primary_key=True)
+    id = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    class_id = db.Column('class_id', db.Integer, db.ForeignKey('classes.id'))
+    student_id = db.Column('student_id', db.Integer, db.ForeignKey('students.id'))
     grade = db.Column('grade', db.String(4), nullable=False)
 
 
@@ -194,9 +195,25 @@ def check_class_capacity(student_class):
 
 
 def add_class(student_id, class_id):
-    db.session.add(Enrollment(student_id=student_id, class_id=class_id, grade = "100"))
+    class_to_add = Classes.query.filter(Classes.id == class_id).first()
+    new_size = class_to_add.enrolled + 1
+    updated = Classes.query.filter_by(id=class_id).update(dict(enrolled=new_size))
+    db.session.add(Enrollment(student_id=student_id, class_id=class_id, grade="100"))
     db.session.commit()
 
+
+def drop_class(student_id, class_id):
+    class_to_drop = Classes.query.filter(Classes.id == class_id).first()
+    new_size = class_to_drop.enrolled - 1
+    Enrollment.query.filter(Enrollment.student_id == student_id and Enrollment.class_id == class_id).\
+        delete()
+    db.session.commit()
+
+
+def is_enrolled(class_id, student_id):
+    enroll_class = Enrollment.query.filter(Enrollment.class_id == class_id).first()
+    enroll_student = Enrollment.query.filter(Enrollment.student_id == student_id).first()
+    return ()
 
 @app.route('/')
 def home():
@@ -269,16 +286,6 @@ def teacher_page():
 @app.route('/user/registration', methods=['POST', 'GET'])
 @login_required
 def registration():
-    if request.method == 'POST':
-        classID = int(request.form['class'])
-        selectedClass = Classes.query.filter(Classes.id == classID).first()
-        if check_class_capacity(selectedClass):
-            return render_template(
-                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-                name=name, classes=classes, teachers=Teachers)
-        else:
-            add_class(current_user.id,classID)
-        return redirect(url_for('user_page'))
     user = Users.query.filter_by(id=current_user.id).first()
     student = Students.query.filter(Students.user_id == user.id).first()
     name = student.first_name
@@ -292,11 +299,26 @@ def registration():
         times.append(c.timeslot)
         enrolled.append(c.enrolled)
         cap.append(c.size)
-    # full = check_class_capacity()
+
+    if request.method == 'POST':
+        class_id = int(request.form['class'])
+        selected_class = Classes.query.filter(Classes.id == class_id).first()
+        student = Students.query.filter(Students.user_id == current_user.id).first()
+        if check_class_capacity(selected_class):
+            return render_template(
+                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                name=name, classes=classes, teachers=Teachers, error='haha')
+        else:
+            if not is_enrolled(class_id, student.id):
+                add_class(student.id, class_id)
+            else:
+                return render_template(
+                'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
+                name=name, classes=classes, teachers=Teachers, error='You are currently enrolled in this class!')
+        return redirect(url_for('user_page'))
     return render_template(
         'registration.html', class_names=class_names, times=times, enrolled=enrolled, cap=cap,
-        name=name, classes=classes, teachers=Teachers
-    )
+        name=name, classes=classes, teachers=Teachers, error='')
 
 
 @app.route('/logout')
@@ -314,6 +336,19 @@ def class_cs106():
         return redirect(url_for('login'))
     return render_template('cse106.html')
 
+
+@app.route('/drop', methods=['GET', 'POST'])
+@login_required
+def drop():
+    if request.method == 'POST':
+        class_id = int(request.form['drop'])
+        student = Students.query.filter(Students.user_id == current_user.id).first()
+        if student.classes.query.filter(student.classes.id == class_id):
+            drop_class(student.id, class_id)
+            return redirect(url_for('registration'))
+        else:
+            return redirect(url_for('registration'))
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
