@@ -6,13 +6,8 @@
     <link rel = "stylesheet" href="{{ url_for('static', filename='css/login_style.css') }}">
 
 </head>
-<body>
-<form>
-        <button type="submit" name="reg_button" value="submit_value" class="link-button">
-            Grader mode
-        </button>
-    </form>
-       <br> <Form action="{{url_for('logout')}}">
+<body style = "background: url('/static/1.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: cover; background-position: center">
+        <Form action="{{url_for('logout')}}">
             <div>
                 <button class="log-button">Log Out</button>
             </div>
@@ -29,7 +24,11 @@
                         <th>Students Enrolled</th>
                         {% for i in range(classes|length) %}
                             <tr>
-                                <td>{{classes[i]}}</td>
+                                <td>
+                                    <Form action="{{url_for('class_cs106')}}" method="post">
+                                        <button class="link-button2" type="submit" value="submit_value">{{classes[i]}}</button>
+                                    </Form>
+                                </td>
                                 <td>{{teachers[i]}}</td>
                                 <td>{{times[i]}}</td>
                                  <td>{{enrolled[i]}}/{{cap[i]}}</td>
