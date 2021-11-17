@@ -35,7 +35,7 @@ class AdminIndex(AdminIndexView):
         return super(AdminIndex, self).index()
 
     def is_accessible(self):
-        return is_teacher(current_user)
+        return current_user.is_authenticated and is_teacher(current_user)
 
 
 class AdminMixin:
@@ -108,6 +108,10 @@ class TeacherView(AdminMixin, sqla.ModelView):
     pass
 
 
+class EnrollmentView(AdminMixin, sqla.ModelView):
+    pass
+
+
 # sets up admin page, index_view takes the view perms from AdminIndex()
 admin = Admin(app, name='Database', template_mode='bootstrap3', index_view=AdminIndex())
 
@@ -116,6 +120,8 @@ admin.add_view(UserView(Users, db.session))
 admin.add_view(ClassView(Classes, db.session))
 admin.add_view(StudentView(Students, db.session))
 admin.add_view(TeacherView(Teachers, db.session))
+admin.add_view(EnrollmentView(Enrollment, db.session))
+
 
 
 db.create_all()
